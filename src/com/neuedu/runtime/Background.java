@@ -24,7 +24,7 @@ public class Background extends BaseSprite implements Moveable, Drawable {
 
     @Override
     public void move() {
-        setY(getY()+1);
+        setY(getY()+FrameConstant.GAME_SPEED);
 
     }
 
