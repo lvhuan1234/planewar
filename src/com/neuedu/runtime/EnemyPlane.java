@@ -14,24 +14,37 @@ import java.util.Random;
 public class EnemyPlane extends BaseSprite implements Moveable, Drawable {
 
     private Image image;
+    private Image image2;
 
-    private int speed = FrameConstant.GAME_SPEED * 3;
+    private int speed = FrameConstant.GAME_SPEED * 5;
 
     private Random random = new Random();
 
-    public EnemyPlane() {
-        this(0, 0, ImageMap.get("ep01"));
+    private int type;
+
+    public int getType() {
+        return type;
     }
 
-    public EnemyPlane(int x, int y, Image image) {
+    public EnemyPlane() {
+        this(0, 0, 1);
+    }
+
+    public EnemyPlane(int x, int y, int type) {
         super(x, y);
-        this.image = image;
+        this.type = type;
+        this.image = ImageMap.get("ep01");
+        this.image2 = ImageMap.get("ep02");
     }
 
     @Override
     public void draw(Graphics g) {
-        g.drawImage(image, getX(), getY(), image.getWidth(null), image.getHeight(null), null);
         move();
+        if (type == 1) {
+            g.drawImage(image, getX(), getY(), image.getWidth(null), image.getHeight(null), null);
+        } else if (type == 2) {
+            g.drawImage(image2, getX(), getY(), image.getWidth(null), image.getHeight(null), null);
+        }
         fire();
     }
 
@@ -46,21 +59,45 @@ public class EnemyPlane extends BaseSprite implements Moveable, Drawable {
 
     }
 
+    private boolean right = true;
+
     @Override
     public void move() {
-        setY(getY() + speed);
+        if (type == 1) {
+            setY(getY() + speed);
+        } else if (type == 2) {
+            if (right) {
+                setX(getX() + speed);
+                setY(getY()+speed);
+            } else {
+                setX(getX() - speed);
+                setY(getY()+speed);
+            }
+        }
+
         borderTesting();
     }
 
     public void borderTesting() {
-        if (getY() > FrameConstant.FRAME_HEIGHT) {
-            GameFrame gameFrame = DataStore.get("gameFrame");
-            gameFrame.enemyPlaneList.remove(this);
+        if (type == 1) {
+            if (getY() > FrameConstant.FRAME_HEIGHT) {
+                GameFrame gameFrame = DataStore.get("gameFrame");
+                gameFrame.enemyPlaneList.remove(this);
+
+            }
+        } else if (type == 2) {
+            if (getX() + image2.getWidth(null) >= FrameConstant.FRAME_WIDTH) {
+                right = false;
+            } else if (getX() < 0) {
+                right = true;
+            }
         }
+
     }
+
 
     @Override
     public Rectangle getRectangle() {
-        return new Rectangle(getX(),getY(),image.getWidth(null),image.getHeight(null));
+        return new Rectangle(getX(), getY(), image.getWidth(null), image.getHeight(null));
     }
 }

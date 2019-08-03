@@ -6,20 +6,22 @@ import com.neuedu.base.Moveable;
 import com.neuedu.constant.FrameConstant;
 import com.neuedu.main.GameFrame;
 import com.neuedu.util.DataStore;
+import com.neuedu.util.ImageMap;
 
 import java.awt.*;
 import java.util.List;
 
-public class EnemyBullet extends BaseSprite implements Moveable, Drawable {
+public class BossBullet extends BaseSprite implements Moveable, Drawable {
+
     private Image image;
 
-    private int speed = FrameConstant.GAME_SPEED*5;
+    private int speed = FrameConstant.GAME_SPEED*10;
 
-    public EnemyBullet() {
-
+    public BossBullet() {
+        this(0,0,ImageMap.get("bob1"));
     }
 
-    public EnemyBullet(int x, int y, Image image) {
+    public BossBullet(int x, int y, Image image) {
         super(x, y);
         this.image = image;
     }
@@ -27,8 +29,8 @@ public class EnemyBullet extends BaseSprite implements Moveable, Drawable {
     @Override
     public void draw(Graphics g) {
         move();
-        g.drawImage(image,getX(),getY(),image.getWidth(null),image.getHeight(null),null);
-
+        g.drawImage(image,getX(),getY(),image.getWidth(null),
+                image.getHeight(null),null);
     }
 
     @Override
@@ -36,30 +38,27 @@ public class EnemyBullet extends BaseSprite implements Moveable, Drawable {
         if (getY()+image.getHeight(null)>0) {
             setY(getY()+speed);
         }
-
         borderTesting();
     }
 
     public void borderTesting() {
         if (getY()>FrameConstant.FRAME_HEIGHT) {
             GameFrame gameFrame = DataStore.get("gameFrame");
-            gameFrame.enemyBulletList.remove(this);
+            gameFrame.bossBulletList.remove(this);
         }
     }
 
     @Override
     public Rectangle getRectangle() {
-        return new Rectangle(getX(),getY(),image.getWidth(null),image.getHeight(null));
+        return new Rectangle(getX(), getY(), image.getWidth(null), image.getHeight(null));
     }
 
-    //敌方子弹与飞机碰撞
     public void collisionTesting(Plane plane) {
         GameFrame gameFrame = DataStore.get("gameFrame");
         if (plane.getRectangle().intersects(this.getRectangle())) {
-            gameFrame.enemyBulletList.remove(this);
-
+            gameFrame.bossBulletList.remove(this);
             if (gameFrame.hp>0) {
-                gameFrame.hp-=10;
+                gameFrame.hp-=30;
             }else {
                 gameFrame.gameOver = true;
             }
